@@ -28,29 +28,31 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/action_bar_dependency_layout"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:layout_marginHorizontal="14dp"
-                android:layout_marginBottom="12dp">
+                android:layout_height="60dp">
 
                 <TextView
                     android:id="@+id/tv_category"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="14dp"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="24dp"
                     android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center"
                     android:text="@string/icon_category_material_symbols"
                     android:textSize="14sp"
                     app:drawableEndCompat="@drawable/ic_arrow_drop_down"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0" />
 
                 <com.google.android.material.textfield.MaterialAutoCompleteTextView
                     android:id="@+id/et_search"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="48dp"
                     android:layout_marginStart="8dp"
+                    android:layout_marginEnd="14dp"
                     android:background="@null"
                     android:drawableStart="@drawable/ic_search"
                     android:drawablePadding="4dp"
@@ -59,7 +61,8 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/tv_category"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -4,17 +4,18 @@ import android.annotation.SuppressLint
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.Color
+import android.graphics.Rect
+import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.graphics.ColorUtils
-import androidx.core.view.MarginLayoutParamsCompat
-import androidx.core.view.updateLayoutParams
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.internal.EdgeToEdgeUtils
@@ -35,39 +36,54 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         val toolBar = findViewById<Toolbar>(R.id.tool_bar)
         setSupportActionBar(toolBar)
         val drawerLayout = findViewById<DrawerLayout>(R.id.drawer_layout)
-        drawerToggle = ActionBarDrawerToggle(this,
+        drawerToggle = ActionBarDrawerToggle(
+            this,
             drawerLayout,
             toolBar,
             androidx.appcompat.R.string.abc_action_menu_overflow_description,
-            androidx.constraintlayout.widget.R.string.abc_action_bar_home_description)
+            androidx.constraintlayout.widget.R.string.abc_action_bar_home_description
+        )
         drawerToggle.syncState()
 
         val actionBarDependencyLayout = findViewById<View>(R.id.action_bar_dependency_layout)
+        val tvCategory = findViewById<TextView>(R.id.tv_category)
+        val etSearch = findViewById<EditText>(R.id.et_search)
         val shapeDrawable = MaterialShapeDrawable().apply {
-            setCornerSize(60.dpf)
-            setStroke(1.dpf, Color.GRAY)
             fillColor = ColorStateList.valueOf(Color.TRANSPARENT)
+            setStroke(
+                1.dpf,
+                Color.GRAY
+            )
         }
-        actionBarDependencyLayout.background = shapeDrawable
-        val savedMargin =
-            ViewGroup.MarginLayoutParams(actionBarDependencyLayout.layoutParams as ViewGroup.MarginLayoutParams)
         val appBarLayout = findViewById<AppBarLayout>(R.id.app_bar_layout)
-        var lastVerticalOffset = -1
         appBarLayout.addOnOffsetChangedListener { _, verticalOffset ->
-            if (lastVerticalOffset == verticalOffset) return@addOnOffsetChangedListener
             val p = 1f - abs(verticalOffset).toFloat() / toolBar.height
-            shapeDrawable.setCornerSize(p * 60.dpf)
-            shapeDrawable.setStroke(3f,
-                ColorUtils.setAlphaComponent(Color.GRAY, (p * 255).roundToInt()))
-            actionBarDependencyLayout.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                height = (48 + (1 - p) * 12).dp
-                topMargin = (savedMargin.topMargin * p).roundToInt()
-                bottomMargin = (savedMargin.bottomMargin * p).roundToInt()
-                marginStart =
-                    (MarginLayoutParamsCompat.getMarginStart(savedMargin) * p).roundToInt()
-                marginEnd = (MarginLayoutParamsCompat.getMarginEnd(savedMargin) * p).roundToInt()
+            shapeDrawable.setCornerSize(p * 48.dpf)
+            shapeDrawable.alpha = (p * 255).roundToInt()
+            val inset = (12.dpf * p).roundToInt()
+
+            actionBarDependencyLayout.background = object : InsetDrawable(
+                shapeDrawable,
+                inset,
+                0,
+                inset,
+                inset,
+            ) {
+                override fun getPadding(padding: Rect): Boolean {
+                    return false
+                }
+
+                override fun getMinimumHeight(): Int {
+                    return -1
+                }
+
+                override fun getMinimumWidth(): Int {
+                    return -1
+                }
             }
-            lastVerticalOffset = verticalOffset
+            val topOffset = 12.dpf * (1 - p) / 2f
+            tvCategory.y = topOffset
+            etSearch.y = topOffset
         }
         appBarLayout.statusBarForeground =
             MaterialShapeDrawable.createWithElevationOverlay(this)
