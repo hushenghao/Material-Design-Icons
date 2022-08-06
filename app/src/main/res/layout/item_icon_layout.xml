@@ -4,16 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:layout_width="80dp">
+    android:paddingVertical="12dp"
+    tools:layout_width="96dp">
 
     <TextView
         android:id="@+id/tv_icon"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_marginTop="6dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:gravity="center"
         android:textAppearance="?attr/textAppearanceCaption"
-        android:textSize="36dp"
+        android:textSize="48dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -24,8 +24,9 @@
         android:id="@+id/tv_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal|top"
-        android:includeFontPadding="false"
+        android:layout_marginTop="12dp"
+        android:fontFamily="sans-serif"
+        android:gravity="center_horizontal"
         android:lines="2"
         android:textAppearance="?attr/textAppearanceCaption"
         android:textSize="12sp"

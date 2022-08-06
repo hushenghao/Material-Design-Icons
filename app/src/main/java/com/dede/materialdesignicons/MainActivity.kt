@@ -1,6 +1,5 @@
 package com.dede.materialdesignicons
 
-import android.annotation.SuppressLint
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.Color
@@ -15,9 +14,10 @@ import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.core.graphics.ColorUtils
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.appbar.AppBarLayout
+import com.google.android.material.color.MaterialColors
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.internal.EdgeToEdgeUtils
 import com.google.android.material.shape.MaterialShapeDrawable
 import kotlin.math.abs
@@ -26,11 +26,14 @@ import kotlin.math.roundToInt
 class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
     private lateinit var drawerToggle: ActionBarDrawerToggle
+    private lateinit var _floatingActionUpward: FloatingActionButton
 
-    @SuppressLint("RestrictedApi")
+    val floatingActionUpward: FloatingActionButton
+        get() = _floatingActionUpward
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        @Suppress("RestrictedApi")
         EdgeToEdgeUtils.applyEdgeToEdge(window, true)
 
         val toolBar = findViewById<Toolbar>(R.id.tool_bar)
@@ -45,15 +48,18 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         )
         drawerToggle.syncState()
 
+        _floatingActionUpward = findViewById(R.id.floating_action_upward)
         val actionBarDependencyLayout = findViewById<View>(R.id.action_bar_dependency_layout)
         val tvCategory = findViewById<TextView>(R.id.tv_category)
         val etSearch = findViewById<EditText>(R.id.et_search)
+        val strokeColor = MaterialColors.getColor(
+            this,
+            com.google.android.material.R.attr.colorOnContainer,
+            Color.GRAY
+        )
         val shapeDrawable = MaterialShapeDrawable().apply {
             fillColor = ColorStateList.valueOf(Color.TRANSPARENT)
-            setStroke(
-                1.dpf,
-                Color.GRAY
-            )
+            setStroke(1.dpf, strokeColor)
         }
         val appBarLayout = findViewById<AppBarLayout>(R.id.app_bar_layout)
         appBarLayout.addOnOffsetChangedListener { _, verticalOffset ->

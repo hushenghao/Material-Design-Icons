@@ -10,8 +10,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-        app:spanCount="4"
-        tools:itemCount="16"
+        app:spanCount="3"
+        tools:itemCount="11"
         tools:listitem="@layout/item_icon_layout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

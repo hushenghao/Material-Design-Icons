@@ -2,6 +2,7 @@ package com.dede.materialdesignicons
 
 import android.content.Context
 import android.graphics.Typeface
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -42,15 +43,24 @@ class IconListFragment : Fragment(R.layout.fragment_icon_list) {
         const val TYPE_FILLED = "Filled"
     }
 
-//    private val icons = IconConfig(MATERIAL_SYMBOLS,
+    private val icons = IconConfig(
+        CATEGORY_MATERIAL_SYMBOLS,
+        TYPE_ROUNDED,
+        "variablefont/MaterialSymbolsRounded[FILL,GRAD,opsz,wght].codepoints",
+        "variablefont/MaterialSymbolsRounded[FILL,GRAD,opsz,wght].ttf"
+    )
+
+//    private val icons = IconConfig(
+//        CATEGORY_MATERIAL_SYMBOLS,
 //        TYPE_OUTLINED,
 //        "variablefont/MaterialSymbolsOutlined[FILL,GRAD,opsz,wght].codepoints",
-//        "variablefont/MaterialSymbolsOutlined[FILL,GRAD,opsz,wght].ttf")
+//        "variablefont/MaterialSymbolsOutlined[FILL,GRAD,opsz,wght].ttf"
+//    )
 
-    private val icons = IconConfig(CATEGORY_MATERIAL_ICONS,
-        TYPE_FILLED,
-        "font/MaterialIconsOutlined-Regular.codepoints",
-        "font/MaterialIconsOutlined-Regular.otf")
+//    private val icons = IconConfig(CATEGORY_MATERIAL_ICONS,
+//        TYPE_FILLED,
+//        "font/MaterialIconsOutlined-Regular.codepoints",
+//        "font/MaterialIconsOutlined-Regular.otf")
 
     private val splitRegex = "\\s".toRegex()
     private val connectorRegex = "(_[a-z])".toRegex()
@@ -76,7 +86,8 @@ class IconListFragment : Fragment(R.layout.fragment_icon_list) {
                     sb.replace(
                         group.range.first,
                         group.range.last + 1,
-                        uppercase)
+                        uppercase
+                    )
                 }
                 Icon(sb.toString(), name, list[1].toInt(16).toChar())
             }
@@ -89,8 +100,14 @@ class IconListFragment : Fragment(R.layout.fragment_icon_list) {
     private class IconsAdapter(context: Context, iconConfig: IconConfig, val list: List<Icon>) :
         RecyclerView.Adapter<IconsAdapter.VHolder>() {
 
-        private val typeface = Typeface.createFromAsset(context.assets, iconConfig.source)
-        private val textTypeface = Typeface.createFromAsset(context.assets, "googlesanstext.woff2")
+        private val typeface =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                Typeface.Builder(context.assets, iconConfig.source)
+                    .setFontVariationSettings("'FILL' 0, 'GRAD' 0, 'opsz' 48, 'wght' 400")
+                    .build()
+            } else {
+                Typeface.createFromAsset(context.assets, iconConfig.source)
+            }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VHolder {
             val itemView = LayoutInflater.from(parent.context)
@@ -106,7 +123,6 @@ class IconListFragment : Fragment(R.layout.fragment_icon_list) {
             }
             holder.tvName.apply {
                 text = icon.name
-                typeface = this@IconsAdapter.textTypeface
             }
         }
 
