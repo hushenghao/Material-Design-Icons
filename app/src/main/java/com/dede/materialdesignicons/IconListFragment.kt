@@ -1,6 +1,5 @@
 package com.dede.materialdesignicons
 
-import android.content.Context
 import android.graphics.Typeface
 import android.os.Build
 import android.os.Bundle
@@ -9,105 +8,58 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.dede.materialdesignicons.databinding.FragmentIconListBinding
 
-/**
- * Created by shhu on 2022/8/4 16:14.
- *
- * @author shhu
- * @since 2022/8/4
- */
 class IconListFragment : Fragment(R.layout.fragment_icon_list) {
 
-    data class IconConfig(
-        val category: String,
-        val type: String,
-        val codepoints: String,
-        val source: String,
-    )
-
-    data class Icon(
-        val name: String,
-        val keyName: String,
-        val char: Char,
-    )
-
-    companion object {
-        const val CATEGORY_MATERIAL_ICONS = "material_icons"
-        const val CATEGORY_MATERIAL_SYMBOLS = "material_symbols"
-
-        const val TYPE_OUTLINED = "Outlined"
-        const val TYPE_ROUNDED = "Rounded"
-        const val TYPE_SHARP = "Sharp"
-        const val TYPE_TWO_TONE = "TwoTone"
-        const val TYPE_FILLED = "Filled"
-    }
-
-    private val icons = IconConfig(
-        CATEGORY_MATERIAL_SYMBOLS,
-        TYPE_ROUNDED,
-        "variablefont/MaterialSymbolsRounded[FILL,GRAD,opsz,wght].codepoints",
-        "variablefont/MaterialSymbolsRounded[FILL,GRAD,opsz,wght].ttf"
-    )
-
-//    private val icons = IconConfig(
-//        CATEGORY_MATERIAL_SYMBOLS,
-//        TYPE_OUTLINED,
-//        "variablefont/MaterialSymbolsOutlined[FILL,GRAD,opsz,wght].codepoints",
-//        "variablefont/MaterialSymbolsOutlined[FILL,GRAD,opsz,wght].ttf"
-//    )
-
-//    private val icons = IconConfig(CATEGORY_MATERIAL_ICONS,
-//        TYPE_FILLED,
-//        "font/MaterialIconsOutlined-Regular.codepoints",
-//        "font/MaterialIconsOutlined-Regular.otf")
-
-    private val splitRegex = "\\s".toRegex()
-    private val connectorRegex = "(_[a-z])".toRegex()
+    private lateinit var binding: FragmentIconListBinding
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val tempList = ArrayList<MatchResult>()
-        val icons = requireContext().assets.open(icons.codepoints)
-            .reader()
-            .readLines()
-            .asSequence()
-            .filter { it.isNotBlank() }
-            .map {
-                val list = it.split(splitRegex)
-                val name = list[0]
-                val sb = StringBuilder(name)
-                sb.replace(0, 1, sb[0].uppercase())
-                tempList.clear()
-                val resultList = connectorRegex.findAll(name).toCollection(tempList)
-                for (result in resultList) {
-                    val group = result.groups[1] ?: continue
-                    val uppercase = group.value.replace("_", " ").uppercase()
-                    sb.replace(
-                        group.range.first,
-                        group.range.last + 1,
-                        uppercase
-                    )
-                }
-                Icon(sb.toString(), name, list[1].toInt(16).toChar())
-            }
-            .toList()
+        binding = FragmentIconListBinding.bind(view)
+        binding.recyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
 
-        val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
-        recyclerView.adapter = IconsAdapter(requireContext(), this.icons, icons)
+        val category = arguments?.getString(EXTRA_CATEGORY) ?: CATEGORY_MATERIAL_SYMBOLS
+        val type = arguments?.getString(EXTRA_TYPE) ?: TYPE_OUTLINED
+        setDataInternal(category, type)
     }
 
-    private class IconsAdapter(context: Context, iconConfig: IconConfig, val list: List<Icon>) :
-        RecyclerView.Adapter<IconsAdapter.VHolder>() {
+    fun setCategory(category: String) {
+        val type = arguments?.getString(EXTRA_TYPE) ?: TYPE_OUTLINED
+        setDataInternal(category, type)
+    }
 
-        private val typeface =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                Typeface.Builder(context.assets, iconConfig.source)
+    fun setType(type: String) {
+        val category = arguments?.getString(EXTRA_CATEGORY) ?: CATEGORY_MATERIAL_SYMBOLS
+        setDataInternal(category, type)
+    }
+
+    private fun setDataInternal(category: String, type: String) {
+        arguments?.putString(EXTRA_CATEGORY, category)
+        arguments?.putString(EXTRA_TYPE, type)
+        val iconSource: IconSource = if (category == CATEGORY_MATERIAL_ICONS) {
+            materialIcons[type]!!
+        } else {
+            materialSymbols[type]!!
+        }
+        val assets = requireContext().assets
+        val typeface =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && category == CATEGORY_MATERIAL_SYMBOLS) {
+                Typeface.Builder(assets, iconSource.source)
                     .setFontVariationSettings("'FILL' 0, 'GRAD' 0, 'opsz' 48, 'wght' 400")
                     .build()
             } else {
-                Typeface.createFromAsset(context.assets, iconConfig.source)
+                Typeface.createFromAsset(assets, iconSource.source)
             }
+
+        binding.recyclerView.adapter =
+            IconsAdapter(typeface, iconSource.getSource(requireContext()))
+    }
+
+    private class IconsAdapter(val iconTypeface: Typeface, val list: List<Icon>) :
+        RecyclerView.Adapter<IconsAdapter.VHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VHolder {
             val itemView = LayoutInflater.from(parent.context)
@@ -119,7 +71,7 @@ class IconListFragment : Fragment(R.layout.fragment_icon_list) {
             val icon = list[position]
             holder.tvIcon.apply {
                 text = icon.char.toString()
-                typeface = this@IconsAdapter.typeface
+                typeface = iconTypeface
             }
             holder.tvName.apply {
                 text = icon.name
@@ -135,5 +87,4 @@ class IconListFragment : Fragment(R.layout.fragment_icon_list) {
             val tvName: TextView = view.findViewById(R.id.tv_name)
         }
     }
-
 }

@@ -34,7 +34,7 @@
                     android:id="@+id/tv_category"
                     android:layout_width="wrap_content"
                     android:layout_height="48dp"
-                    android:layout_marginStart="24dp"
+                    android:layout_marginStart="26dp"
                     android:background="?attr/selectableItemBackground"
                     android:clickable="true"
                     android:focusable="true"
@@ -55,11 +55,11 @@
                     android:layout_marginStart="8dp"
                     android:layout_marginEnd="14dp"
                     android:background="@null"
-                    android:drawableStart="@drawable/ic_round_search"
                     android:drawablePadding="4dp"
                     android:fontFamily="sans-serif-medium"
                     android:hint="@string/hint_label_search"
                     android:textSize="14sp"
+                    app:drawableStartCompat="@drawable/ic_round_search"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/tv_category"
@@ -83,9 +83,12 @@
             android:layout_gravity="bottom|end"
             android:layout_marginEnd="32dp"
             android:layout_marginBottom="64dp"
+            android:contentDescription="@string/label_return_to_top"
             android:src="@drawable/ic_round_arrow_upward"
+            android:tooltipText="@string/label_return_to_top"
             app:layout_behavior="com.dede.materialdesignicons.ScrollTopFABBehavior"
-            app:scrollable_ids="app_bar_layout,recycler_view" />
+            app:scrollable_ids="app_bar_layout,recycler_view"
+            tools:targetApi="o" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

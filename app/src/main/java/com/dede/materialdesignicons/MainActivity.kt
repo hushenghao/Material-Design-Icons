@@ -7,54 +7,49 @@ import android.graphics.Rect
 import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
 import android.util.TypedValue
+import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.Toolbar
 import androidx.drawerlayout.widget.DrawerLayout
+import com.dede.materialdesignicons.databinding.ActivityMainBinding
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.color.MaterialColors
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.internal.EdgeToEdgeUtils
 import com.google.android.material.shape.MaterialShapeDrawable
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
-class MainActivity : AppCompatActivity(R.layout.activity_main) {
+class MainActivity : AppCompatActivity() {
 
     private lateinit var drawerToggle: ActionBarDrawerToggle
-    private lateinit var _floatingActionUpward: FloatingActionButton
-
-    val floatingActionUpward: FloatingActionButton
-        get() = _floatingActionUpward
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         @Suppress("RestrictedApi")
         EdgeToEdgeUtils.applyEdgeToEdge(window, true)
-
-        val toolBar = findViewById<Toolbar>(R.id.tool_bar)
-        setSupportActionBar(toolBar)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        setSupportActionBar(binding.toolBar)
         val drawerLayout = findViewById<DrawerLayout>(R.id.drawer_layout)
         drawerToggle = ActionBarDrawerToggle(
             this,
             drawerLayout,
-            toolBar,
+            binding.toolBar,
             androidx.appcompat.R.string.abc_action_menu_overflow_description,
             androidx.constraintlayout.widget.R.string.abc_action_bar_home_description
         )
         drawerToggle.syncState()
 
-        _floatingActionUpward = findViewById(R.id.floating_action_upward)
-        val actionBarDependencyLayout = findViewById<View>(R.id.action_bar_dependency_layout)
-        val tvCategory = findViewById<TextView>(R.id.tv_category)
-        val etSearch = findViewById<EditText>(R.id.et_search)
         val strokeColor = MaterialColors.getColor(
             this,
-            com.google.android.material.R.attr.colorOnContainer,
+            com.google.android.material.R.attr.colorContainer,
             Color.GRAY
         )
         val shapeDrawable = MaterialShapeDrawable().apply {
@@ -63,12 +58,12 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         }
         val appBarLayout = findViewById<AppBarLayout>(R.id.app_bar_layout)
         appBarLayout.addOnOffsetChangedListener { _, verticalOffset ->
-            val p = 1f - abs(verticalOffset).toFloat() / toolBar.height
+            val p = 1f - abs(verticalOffset).toFloat() / binding.toolBar.height
             shapeDrawable.setCornerSize(p * 48.dpf)
             shapeDrawable.alpha = (p * 255).roundToInt()
             val inset = (12.dpf * p).roundToInt()
 
-            actionBarDependencyLayout.background = object : InsetDrawable(
+            binding.actionBarDependencyLayout.background = object : InsetDrawable(
                 shapeDrawable,
                 inset,
                 0,
@@ -88,11 +83,35 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
                 }
             }
             val topOffset = 12.dpf * (1 - p) / 2f
-            tvCategory.y = topOffset
-            etSearch.y = topOffset
+            binding.tvCategory.y = topOffset
+            binding.etSearch.y = topOffset
         }
         appBarLayout.statusBarForeground =
             MaterialShapeDrawable.createWithElevationOverlay(this)
+
+        binding.tvCategory.setOnClickListener { v ->
+            PopupMenu(this, v, Gravity.BOTTOM).apply {
+                inflate(R.menu.menu_drop_category_selector)
+                setOnMenuItemClickListener {
+                    val category = when (it.itemId) {
+                        R.id.menu_material_icons -> {
+                            CATEGORY_MATERIAL_ICONS
+                        }
+                        R.id.menu_material_symbols -> {
+                            CATEGORY_MATERIAL_SYMBOLS
+                        }
+                        else -> {
+                            return@setOnMenuItemClickListener false
+                        }
+                    }
+                    val fragment =
+                        supportFragmentManager.findFragmentById(R.id.fragment_container_view) as IconListFragment
+                    fragment.setCategory(category)
+                    binding.tvCategory.text = it.title
+                    return@setOnMenuItemClickListener true
+                }
+            }.show()
+        }
 
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container_view, IconListFragment())

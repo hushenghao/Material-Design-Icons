@@ -3,4 +3,7 @@
     <string name="app_title">Google Fonts</string>
     <string name="icon_category_material_symbols">Material Symbols</string>
     <string name="hint_label_search">Search</string>
+    <string name="label_material_symbols">Material Symbols</string>
+    <string name="label_material_icons">Material Icons</string>
+    <string name="label_return_to_top">Return to top</string>
 </resources>
